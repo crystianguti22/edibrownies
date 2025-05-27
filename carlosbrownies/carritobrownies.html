@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Carrito - EDIBROWNIES</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fff8f0;
+            padding: 20px;
+            color: #3e2c23;
+        }
+
+        h1 {
+            color: #6b3e26;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            gap: 15px;
+        }
+
+        .cart-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+        }
+
+        .cart-details {
+            flex: 1;
+        }
+
+        .cart-details h3 {
+            margin: 0 0 5px;
+            font-size: 1.2em;
+        }
+
+        .cart-details p {
+            margin: 4px 0;
+            color: #7f5d4b;
+        }
+
+        .total {
+            font-size: 1.8em;
+            margin-top: 25px;
+            text-align: right;
+            color: #e67e22;
+            font-weight: bold;
+        }
+
+        .button-group {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        button, .back-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        button:hover, .back-button:hover {
+            transform: scale(1.05);
+        }
+
+        .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+            margin-top: 8px;
+        }
+
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .whatsapp-btn {
+            background-color: #25d366;
+            color: white;
+        }
+
+        .whatsapp-btn:hover {
+            background-color: #1ebe5b;
+        }
+
+        .vaciar-btn {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        .vaciar-btn:hover {
+            background-color: #d68910;
+        }
+
+        .back-button {
+            background-color: #6c5b7b;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🛒 Tu carrito</h1>
+
+    <a href="brownies2.html" class="back-button">← Volver a la tienda</a>
+
+    <div id="cart-container"></div>
+    <p class="total" id="total"></p>
+
+    <div class="button-group">
+        <button class="vaciar-btn" onclick="vaciarCarrito()">Vaciar carrito</button>
+        <button class="whatsapp-btn" onclick="enviarPorWhatsApp()">Pedir por WhatsApp</button>
+    </div>
+
+    <script>
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const container = document.getElementById('cart-container');
+        const totalEl = document.getElementById('total');
+
+        function mostrarCarrito() {
+            container.innerHTML = '';
+            let total = 0;
+
+            if (cart.length === 0) {
+                container.innerHTML = '<p>No hay productos en el carrito.</p>';
+                totalEl.textContent = '';
+                return;
+            }
+
+            cart.forEach((producto, index) => {
+                total += producto.price;
+
+                const item = document.createElement('div');
+                item.className = 'cart-item';
+                item.innerHTML = `
+                    <img src="${producto.image}" alt="${producto.name}">
+                    <div class="cart-details">
+                        <h3>${producto.name}</h3>
+                        <p>Precio: $${producto.price.toFixed(2)}</p>
+                        <button class="delete-btn" onclick="eliminarProducto(${index})">Eliminar</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+
+            totalEl.textContent = `Total: $${total.toFixed(2)} MXN`;
+        }
+
+        function eliminarProducto(index) {
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            mostrarCarrito();
+        }
+
+        function vaciarCarrito() {
+            if (confirm('¿Estás seguro de vaciar el carrito?')) {
+                localStorage.removeItem('cart');
+                cart = [];
+                mostrarCarrito();
+            }
+        }
+
+        function enviarPorWhatsApp() {
+            if (cart.length === 0) {
+                alert('El carrito está vacío');
+                return;
+            }
+
+            let mensaje = "¡Hola EDIBROWNIES! Me gustaría pedir:\n";
+            let total = 0;
+            cart.forEach(p => {
+                mensaje += `- ${p.name}: $${p.price.toFixed(2)} MXN\n`;
+                total += p.price;
+            });
+            mensaje += `\nTotal: $${total.toFixed(2)} MXN pa' andar bien astral 🌌`;
+
+            const url = `https://wa.me/524427777672?text=${encodeURIComponent(mensaje)}`;
+            window.open(url, '_blank');
+        }
+
+        mostrarCarrito();
+    </script>
+
+</body>
+</html>
+
